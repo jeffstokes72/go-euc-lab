@@ -1,0 +1,52 @@
+# - name: Collect API access token from Citrix Cloud
+#   win_uri:
+#     url: "https://api-eu.cloud.com/cctrustoauth2/{{ citrix_org_id }}/tokens/clients"
+#     method: POST
+#     content_type: application/x-www-form-urlencoded
+#     body: "grant_type=client_credentials&client_id={{ citrix_client_id }}&client_secret={{ citrix_client_secret }}"
+#     return_content: yes
+#   register: citrix_token
+
+- name: Create directory structure
+  win_file:
+    path: C:\Temp
+    state: directory
+
+- name: Copy hosting template json file
+  win_copy:
+    src: hosting.json
+    dest: C:\Temp\hosting.json
+
+- name: Collect hosting json template
+  win_shell: Get-Content hosting.json -Raw
+  register: citrix_hosting
+
+- name: Convert hosting json to ansible fact
+  set_fact: 
+    citrix_hosting_json: "{{ citrix_hosting.stdout | from_json }}"
+
+- name: debug output 1
+  ansible.builtin.debug:
+    msg: "{{ citrix_hosting_json }}"
+
+- name: Convert hosting json to ansible fact
+  set_fact: 
+    citrix_hosting_json.Name: "test"
+    citrix_hosting_json.ApplicationId: "test"
+    citrix_hosting_json.ApplicationSecret: "test"
+    citrix_hosting_json.SubscriptionId: "test"
+    citrix_hosting_json.ActiveDirectoryId: "test"
+
+- name: debug output 2
+  ansible.builtin.debug:
+    msg: "{{ citrix_hosting_json }}"
+
+# - name: Get Citrix resource locations
+#   win_uri:
+#     url: https://registry.citrixworkspacesapi.net/{{ citrix_org_id }}/resourcelocations
+#     method: GET
+#     content_type: application/json
+#     headers: "{'Authorization': 'CWSAuth bearer={{citrix_token.json.access_token}}'}"
+#     return_content: yes
+#   register: citrix_resource
+

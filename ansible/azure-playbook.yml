@@ -23,8 +23,9 @@
   hosts: mgnt
   roles:
   - domain-join
-  - visual-studio-code
-  - loadgen
+  # - visual-studio-code
+  # - loadgen
+  - citrix-cloud-configuration
   vars:
     dns_domain_name: 'GO.EUC'
     domain_name: GO

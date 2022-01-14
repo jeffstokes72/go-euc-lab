@@ -1,0 +1,11 @@
+{
+    "ConnectionDetails": {
+      "Name": "Name of the hypervisor",
+      "ConnectionType": "AzureRM",
+      "ApplicationId": "string",
+      "ApplicationSecret": "string",
+      "SubscriptionId": "string",
+      "ActiveDirectoryId": "string",
+      "Environment": "AzureCloud"
+    }
+}
