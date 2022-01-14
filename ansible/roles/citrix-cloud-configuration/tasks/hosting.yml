@@ -12,6 +12,9 @@
     hosting_name:
       ConnectionDetails:
         Name: "test"
+    hosting_connection_type:
+      ConnectionDetails:
+        ConnectionType: AzureRM
     hosting_application_id:
       ConnectionDetails:
         ApplicationId: "test"
@@ -24,10 +27,13 @@
     hosting_active_directory_id:
       ConnectionDetails:
         ActiveDirectoryId: "test"
+    hosting_environment:
+      ConnectionDetails:
+        Environment: AzureCloud
 
 - name: combining the facts
   set_fact:
-    hosting_object: "{{ hosting_name | combine(hosting_application_id, recursive=True) | combine(hosting_application_secret, recursive=True) | combine(hosting_subscription_id, recursive=True) | combine(hosting_active_directory_id, recursive=True)}}"
+    hosting_object: "{{ hosting_name | combine(hosting_connection_type, recursive=True) | combine(hosting_application_id, recursive=True) | combine(hosting_application_secret, recursive=True) | combine(hosting_subscription_id, recursive=True) | combine(hosting_active_directory_id, recursive=True) | combine(hosting_environment, recursive=True) }}"
 
 - name: debug output 2
   ansible.builtin.debug:
