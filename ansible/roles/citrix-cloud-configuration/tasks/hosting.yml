@@ -18,7 +18,7 @@
     dest: C:\Temp\hosting.json
 
 - name: Collect hosting json template
-  win_shell: Get-Content hosting.json -Raw
+  win_shell: Get-Content C:\Temp\hosting.json -Raw
   register: citrix_hosting
 
 - name: Convert hosting json to ansible fact
