@@ -25,11 +25,9 @@
       ConnectionDetails:
         ActiveDirectoryId: "test"
 
-- set_fact:
-    hosting_object: "{{ hosting_name | combine(hosting_application_id, recursive=True) }}"
-    hosting_object: "{{ hosting_object | combine(hosting_application_secret, recursive=True) }}"
-    hosting_object: "{{ hosting_object | combine(hosting_subscription_id, recursive=True) }}"
-    hosting_object: "{{ hosting_object | combine(hosting_active_directory_id, recursive=True) }}"
+- name: combining the facts
+  set_fact:
+    hosting_object: "{{ hosting_name | combine(hosting_application_id, recursive=True) | combine(hosting_application_secret, recursive=True) | combine(hosting_subscription_id, recursive=True) | combine(hosting_active_directory_id, recursive=True)}}"
 
 - name: debug output 2
   ansible.builtin.debug:
