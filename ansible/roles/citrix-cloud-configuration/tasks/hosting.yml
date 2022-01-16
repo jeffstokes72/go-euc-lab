@@ -16,12 +16,20 @@
     return_content: yes
   register: citrix_sites
 
+- name: Debug sites
+  ansible.builtin.debug:
+    msg: "{{ citrix_sites }}"
+
 - name: Set Citrix Cloud site ID
   set_fact:
     citrix_site_id: "{{ data | to_json | from_json | json_query(querystr) }}"
   vars:
-    data: "{{ citrix_sites['json'] }}"
-    querystr: "sites[?contains(displayName,'Virtual Apps and Desktops'))].id | [0]" #First result
+    data: "{{ citrix_sites['json'] | lower }}"
+    querystr: "sites[?contains(displayname,'virtual apps and desktops'))].id | [0]" #First result
+
+- name: Debug sites
+  ansible.builtin.debug:
+    msg: "{{ citrix_site_id }}"
 
 - name: Get Citrix Cloud hypervisor connection
   win_uri:
@@ -32,13 +40,20 @@
     return_content: yes
   register: citrix_hypervisor
 
+- name: Debug hypervisor
+  ansible.builtin.debug:
+    msg: "{{ citrix_hypervisor }}"
+
 - name: Set Citrix Cloud hypervisor ID
   set_fact:
     citrix_hypervisor_id: "{{ data | to_json | from_json | json_query(querystr) }}"
   vars:
-    data: "{{ citrix_hypervisor['json'] }}"
-    querystr: "Items[?contains(Name,'{{ prefix }}-{{ branch }}-AzureConnection'))].id | [0]" #First result
+    data: "{{ citrix_hypervisor['json'] | lower }}"
+    querystr: "items[?contains(name,'{{ prefix | lower }}-{{ branch | lower }}-azureconnection'))].id | [0]" #First result
 
+- name: Debug hypervisor
+  ansible.builtin.debug:
+    msg: "{{ citrix_hypervisor_id }}"
 
 - name: Creating Citrix Cloud hosting body 
   set_fact: 
