@@ -67,7 +67,7 @@
 
 - name: Debug zone
   ansible.builtin.debug:
-    msg: "{{ citrix_zones }}"
+    msg: "{{ citrix_zones['json']['items'] }}"
 
 - name: Debug filter
   ansible.builtin.debug:
