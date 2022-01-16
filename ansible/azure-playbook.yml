@@ -25,7 +25,6 @@
   - domain-join
   # - visual-studio-code
   # - loadgen
-  - citrix-cloud-configuration
   vars:
     dns_domain_name: 'GO.EUC'
     domain_name: GO
@@ -42,6 +41,7 @@
   roles:
   - domain-join
   - citrix-cloud-connector
+  - citrix-cloud-configuration
   vars:
     dns_domain_name: 'GO.EUC'
     domain_admin_user: "GO\\{{ ansible_user }}"
