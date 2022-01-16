@@ -34,7 +34,7 @@
 - name: Get Citrix Cloud hypervisor connection
   win_uri:
     url: https://api.cloud.com/cvad/manage/hypervisors
-    method: GEGT
+    method: GET
     content_type: application/json
     headers: "{'Citrix-CustomerId': '{{ citrix_org_id }}', 'Citrix-InstanceId': '{{ citrix_site_id }}', 'User-Agent': 'GET', 'Authorization': 'CWSAuth bearer={{citrix_token.json.access_token}}'}"
     return_content: yes
