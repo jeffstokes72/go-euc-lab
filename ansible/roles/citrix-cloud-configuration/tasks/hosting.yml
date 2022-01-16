@@ -55,30 +55,30 @@
   ansible.builtin.debug:
     msg: "{{ citrix_hypervisor_id }}"
 
-- name: Get Citrix Cloud zones
-  win_uri:
-    url: "https://api.cloud.com/cvad/manage/Zones"
-    method: GET
-    content_type: application/json
-    headers: "{'Citrix-CustomerId': '{{ citrix_org_id }}', 'Citrix-InstanceId': '{{ citrix_site_id }}', 'User-Agent': 'GET', 'Authorization': 'CWSAuth bearer={{citrix_token.json.access_token}}'}"
-    return_content: yes
-  register: citrix_zones
+# - name: Get Citrix Cloud zones
+#   win_uri:
+#     url: "https://api.cloud.com/cvad/manage/zones"
+#     method: GET
+#     content_type: application/json
+#     headers: "{'Citrix-CustomerId': '{{ citrix_org_id }}', 'Citrix-InstanceId': '{{ citrix_site_id }}', 'User-Agent': 'GET', 'Authorization': 'CWSAuth bearer={{citrix_token.json.access_token}}'}"
+#     return_content: yes
+#   register: citrix_zones
 
-- name: Debug zone
-  ansible.builtin.debug:
-    msg: "{{ citrix_zones['json'] }}"
+# - name: Debug zone
+#   ansible.builtin.debug:
+#     msg: "{{ citrix_zones['json'] }}"
 
-- name: Debug filter
-  ansible.builtin.debug:
-    msg: 
-    - "{{ prefix | lower }}-{{ branch | lower }}"
+# - name: Debug filter
+#   ansible.builtin.debug:
+#     msg: 
+#     - "{{ prefix | lower }}-{{ branch | lower }}"
 
-- name: Set Citrix Cloud zone ID
-  set_fact:
-    citrix_zone_id: "{{ raw | json_query(querystr) }}"
-  vars:
-    raw: "{{ citrix_zones['json'] | lower }}"
-    querystr: "items[?name == 'ryan-cards'].id | [0]"
+# - name: Set Citrix Cloud zone ID
+#   set_fact:
+#     citrix_zone_id: "{{ raw | json_query(querystr) }}"
+#   vars:
+#     raw: "{{ citrix_zones['json'] | lower }}"
+#     querystr: "items[?name == 'ryan-cards'].id | [0]"
 
 - name: Debug zone
   ansible.builtin.debug:
@@ -109,7 +109,7 @@
         Environment: AzureCloud
     hosting_zone:
       ConnectionDetails:
-        Zone: "{{ citrix_zone_id }}"
+        Zone: "98079351-988a-4d89-8163-fbc8a8088244"
   when: citrix_hypervisor_id != None
 
 - name: combining the facts for the hosting body
