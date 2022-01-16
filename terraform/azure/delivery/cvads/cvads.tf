@@ -1,6 +1,6 @@
 module "cloudconnectors" {
   source   = "../../modules/azure.mp.vm.windows"
-  vm_count = 2
+  vm_count = 1
   vm_name  = "${var.workspace}-cc"
 
   azure_resource_group_name = azurerm_resource_group.CVADs.name

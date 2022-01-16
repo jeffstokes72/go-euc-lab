@@ -48,7 +48,7 @@ locals {
 
 variable "delivery" {
   type      = string
-  default   = "cvads"
+  default   = "none"
 }
 
 variable "azure_subscription_id" {
