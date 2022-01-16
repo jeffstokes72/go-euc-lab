@@ -80,9 +80,9 @@
 #     raw: "{{ citrix_zones['json'] | lower }}"
 #     querystr: "items[?name == 'ryan-cards'].id | [0]"
 
-- name: Debug zone
-  ansible.builtin.debug:
-    msg: "{{ citrix_zone_id }}"
+# - name: Debug zone
+#   ansible.builtin.debug:
+#     msg: "{{ citrix_zone_id }}"
 
 - name: Creating Citrix Cloud hosting body 
   set_fact: 
