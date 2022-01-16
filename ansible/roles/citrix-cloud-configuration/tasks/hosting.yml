@@ -76,10 +76,10 @@
 
 - name: Set Citrix Cloud zone ID
   set_fact:
-    citrix_zone_id: "{{ data | json_query(querystr) }}"
+    citrix_zone_id: "{{ data | to_json | from_json | json_query(querystr) }}"
   vars:
     data: "{{ citrix_zones['json'] | lower }}"
-    querystr: "items[?contains(id,'98079351-988a-4d89-8163-fbc8a8088244')].id | [0]"
+    querystr: "items[?contains(name,'ryan-cards')].id | [0]"
   when: citrix_hypervisor_id != None
 
 - name: Debug zone
