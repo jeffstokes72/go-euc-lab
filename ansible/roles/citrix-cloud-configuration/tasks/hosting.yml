@@ -80,7 +80,7 @@
     citrix_zone_id: "{{ data | json_query(querystr) }}"
   vars:
     data: "{{ citrix_zones['json'] | lower }}"
-    querystr: "items[?contains(name, '{{ prefix | lower }}-{{ branch | lower }}')].id"
+    querystr: "*.items[?contains(name, '{{ prefix | lower }}-{{ branch | lower }}')].id"
   when: citrix_hypervisor_id != None
 
 - name: Debug zone
