@@ -63,7 +63,6 @@
     headers: "{'Citrix-CustomerId': '{{ citrix_org_id }}', 'Citrix-InstanceId': '{{ citrix_site_id }}', 'User-Agent': 'GET', 'Authorization': 'CWSAuth bearer={{citrix_token.json.access_token}}'}"
     return_content: yes
   register: citrix_zones
-  when: citrix_hypervisor_id != None
 
 - name: Debug zone
   ansible.builtin.debug:
@@ -76,11 +75,10 @@
 
 - name: Set Citrix Cloud zone ID
   set_fact:
-    citrix_zone_id: "{{ data | to_json | from_json | json_query(querystr) }}"
+    citrix_zone_id: "{{ raw | json_query(querystr) }}"
   vars:
-    data: "{{ citrix_zones['json'] | lower }}"
-    querystr: "items[?contains(name,'ryan-cards')].id | [0]"
-  when: citrix_hypervisor_id != None
+    raw: "{{ citrix_zones['json'] | lower }}"
+    querystr: "items[?name == 'ryan-cards'].id | [0]"
 
 - name: Debug zone
   ansible.builtin.debug:
