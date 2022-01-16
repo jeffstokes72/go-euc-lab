@@ -77,7 +77,7 @@
 
 - name: Set Citrix Cloud zone ID
   set_fact:
-    citrix_zone_id: "{{ data | to_json | from_json | json_query(querystr) }}"
+    citrix_zone_id: "{{ data | json_query(querystr) }}"
   vars:
     data: "{{ citrix_zones['json'] | lower }}"
     querystr: "items[?name=='{{ prefix | lower }}-{{ branch | lower }}'].id"
