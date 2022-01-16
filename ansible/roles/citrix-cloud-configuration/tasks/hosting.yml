@@ -67,14 +67,14 @@
 
 - name: Debug zone
   ansible.builtin.debug:
-    msg: "{{ citrix_zones }}"
+    msg: "{{ citrix_zones['json'] | lower }}"
 
 - name: Set Citrix Cloud zone ID
   set_fact:
     citrix_zone_id: "{{ data | to_json | from_json | json_query(querystr) }}"
   vars:
     data: "{{ citrix_zones['json'] | lower }}"
-    querystr: "items[?contains(name,'{{ prefix | lower }}-{{ branch | lower }}')].id | [0]" #First result
+    querystr: "items[?contains(name,'{{ prefix }}-{{ branch }}')].id | [0]" #First result
   when: citrix_hypervisor_id != None
 
 - name: Debug zone
