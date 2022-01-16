@@ -1,50 +1,93 @@
-# - name: Collect API access token from Citrix Cloud
-#   win_uri:
-#     url: "https://api-eu.cloud.com/cctrustoauth2/{{ citrix_org_id }}/tokens/clients"
-#     method: POST
-#     content_type: application/x-www-form-urlencoded
-#     body: "grant_type=client_credentials&client_id={{ citrix_client_id }}&client_secret={{ citrix_client_secret }}"
-#     return_content: yes
-#   register: citrix_token
+- name: Collect API access token from Citrix Cloud
+  win_uri:
+    url: "https://api-eu.cloud.com/cctrustoauth2/{{ citrix_org_id }}/tokens/clients"
+    method: POST
+    content_type: application/x-www-form-urlencoded
+    body: "grant_type=client_credentials&client_id={{ citrix_client_id }}&client_secret={{ citrix_client_secret }}"
+    return_content: yes
+  register: citrix_token
 
-- name: Convert hosting json to ansible fact
+- name: Get Citrix Cloud sites
+  win_uri:
+    url: https://api-us.cloud.com/catalogservice/{{ citrix_org_id }}/sites
+    method: GET
+    content_type: application/json
+    headers: "{'Authorization': 'CWSAuth bearer={{citrix_token.json.access_token}}'}"
+    return_content: yes
+  register: citrix_sites
+
+- name: Set Citrix Cloud site ID
+  set_fact:
+    citrix_site_id: "{{ data | to_json | from_json | json_query(querystr) }}"
+  vars:
+    data: "{{ citrix_sites['json'] }}"
+    querystr: "sites[?contains(displayName,'Virtual Apps and Desktops'))].id | [0]" #First result
+
+- name: Get Citrix Cloud hypervisor connection
+  win_uri:
+    url: https://api.cloud.com/cvad/manage/hypervisors
+    method: GEGT
+    content_type: application/json
+    headers: "{'Citrix-CustomerId': '{{ citrix_org_id }}', 'Citrix-InstanceId': '{{ citrix_site_id }}', 'User-Agent': 'GET', 'Authorization': 'CWSAuth bearer={{citrix_token.json.access_token}}'}"
+    return_content: yes
+  register: citrix_hypervisor
+
+- name: Set Citrix Cloud hypervisor ID
+  set_fact:
+    citrix_hypervisor_id: "{{ data | to_json | from_json | json_query(querystr) }}"
+  vars:
+    data: "{{ citrix_hypervisor['json'] }}"
+    querystr: "Items[?contains(Name,'{{ prefix }}-{{ branch }}-AzureConnection'))].id | [0]" #First result
+
+
+- name: Creating Citrix Cloud hosting body 
   set_fact: 
     hosting_name:
       ConnectionDetails:
-        Name: "test"
+        Name: "{{ prefix }}-{{ branch }}-AzureConnection"
     hosting_connection_type:
       ConnectionDetails:
         ConnectionType: AzureRM
     hosting_application_id:
       ConnectionDetails:
-        ApplicationId: "test"
+        ApplicationId: "{{ lookup('env', 'AZURE_CLIENT_ID') }}"
     hosting_application_secret:
       ConnectionDetails:
-        ApplicationSecret: "test"
+        ApplicationSecret: "{{ lookup('env', 'AZURE_SECRET') }}"
     hosting_subscription_id:
       ConnectionDetails:
-        SubscriptionId: "test"
+        SubscriptionId: "{{ lookup('env', 'AZURE_SUBSCRIPTION_ID') }}"
     hosting_active_directory_id:
       ConnectionDetails:
-        ActiveDirectoryId: "test"
+        ActiveDirectoryId: "{{ lookup('env', 'AZURE_TENANT') }}"
     hosting_environment:
       ConnectionDetails:
         Environment: AzureCloud
+  when: citrix_hypervisor_id != None
 
-- name: combining the facts
+- name: combining the facts for the hosting body
   set_fact:
     hosting_object: "{{ hosting_name | combine(hosting_connection_type, recursive=True) | combine(hosting_application_id, recursive=True) | combine(hosting_application_secret, recursive=True) | combine(hosting_subscription_id, recursive=True) | combine(hosting_active_directory_id, recursive=True) | combine(hosting_environment, recursive=True) }}"
+  when: citrix_hypervisor_id != None
 
 - name: debug output 2
   ansible.builtin.debug:
     msg: "{{ hosting_object }}"
+  when: citrix_hypervisor_id != None
 
-# - name: Get Citrix resource locations
-#   win_uri:
-#     url: https://registry.citrixworkspacesapi.net/{{ citrix_org_id }}/resourcelocations
-#     method: GET
-#     content_type: application/json
-#     headers: "{'Authorization': 'CWSAuth bearer={{citrix_token.json.access_token}}'}"
-#     return_content: yes
-#   register: citrix_resource
+- name: Post Citrix Cloud hypervisor connection
+  win_uri:
+    url: https://api.cloud.com/cvad/manage/hypervisors
+    method: POST
+    content_type: application/json
+    headers: "{'Citrix-CustomerId': '{{ citrix_org_id }}', 'Citrix-InstanceId': '{{ citrix_site_id }}', 'User-Agent': 'POST', 'Authorization': 'CWSAuth bearer={{citrix_token.json.access_token}}'}"
+    body: "{{ hosting_object | to_json }}"
+    return_content: yes
+  register: citrix_new_hypervisor
+  when: citrix_hypervisor_id != None
+
+- name: Define new hypervisor id
+  set_fact:
+    citrix_hypervisor_id: "{{ citrix_new_hypervisor['json'].id }}"
+  when: citrix_hypervisor_id != None
 
