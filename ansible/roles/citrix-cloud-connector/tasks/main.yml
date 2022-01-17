@@ -59,12 +59,12 @@
     body: "{'name': '{{ prefix | lower }}-{{ environment_short }}-{{ deploymentname }}', 'internalOnly': false, 'timeZone': 'GMT Standard Time', 'readOnly': false}"
     return_content: yes
   register: citrix_new_resource
-  when: citrix_resource_id != None
+  when: citrix_resource_id == ""
   
 - name: Define new resource location id
   set_fact:
     citrix_resource_id: "{{ citrix_new_resource['json'].id }}"
-  when: citrix_resource_id != None
+  when: citrix_resource_id == ""
 
 - name: Install Citrix Cloud Connector
   win_package:

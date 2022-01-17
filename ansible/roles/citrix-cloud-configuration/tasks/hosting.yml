@@ -67,7 +67,7 @@
     headers: "{'Citrix-CustomerId': '{{ citrix_org_id }}', 'Citrix-InstanceId': '{{ citrix_site_id }}', 'User-Agent': 'GET', 'Authorization': 'CWSAuth bearer={{citrix_token.json.access_token}}'}"
     return_content: yes
   register: citrix_zones
-  when: citrix_hypervisor_id != None
+  when: citrix_hypervisor_id == ""
 
 - name: Set Citrix Cloud zone ID
   set_fact:
@@ -75,12 +75,12 @@
   vars:
     data: "{{ citrix_zones.json }}"
     querystr: Items[?Name == '{{ prefix }}-{{ branch }}'].Id | [0]
-  when: citrix_hypervisor_id != None
+  when: citrix_hypervisor_id == ""
 
 - name: Debug zone
   ansible.builtin.debug:
     msg: "{{ citrix_zone_id }}"
-  when: citrix_hypervisor_id != None
+  when: citrix_hypervisor_id == ""
 
 - name: Creating Citrix Cloud hosting body 
   set_fact: 
@@ -108,17 +108,17 @@
     hosting_zone:
       ConnectionDetails:
         Zone: "{{ citrix_zone_id }}"
-  when: citrix_hypervisor_id != None
+  when: citrix_hypervisor_id == ""
 
 - name: combining the facts for the hosting body
   set_fact:
     hosting_object: "{{ hosting_name | combine(hosting_connection_type, recursive=True) | combine(hosting_application_id, recursive=True) | combine(hosting_application_secret, recursive=True) | combine(hosting_subscription_id, recursive=True) | combine(hosting_active_directory_id, recursive=True) | combine(hosting_environment, recursive=True) | combine(hosting_zone, recursive=True) }}"
-  when: citrix_hypervisor_id != None
+  when: citrix_hypervisor_id == ""
 
 - name: debug output 2
   ansible.builtin.debug:
     msg: "{{ hosting_object }}"
-  when: citrix_hypervisor_id != None
+  when: citrix_hypervisor_id == ""
 
 - name: Post Citrix Cloud hypervisor connection
   win_uri:
@@ -130,18 +130,18 @@
     status_code: [200, 201]
     return_content: yes
   register: citrix_new_hypervisor
-  when: citrix_hypervisor_id != None
+  when: citrix_hypervisor_id == ""
 
 - name: debug output 2
   ansible.builtin.debug:
     msg: "{{ citrix_new_hypervisor }}"
-  when: citrix_hypervisor_id != None
+  when: citrix_hypervisor_id == ""
 
 - name: Set the new hypervisor id
   set_fact:
     citrix_hypervisor_id: "{{ citrix_new_hypervisor.json.Id }}"
     msg: "{{ citrix_new_hypervisor }}"
-  when: citrix_hypervisor_id != None
+  when: citrix_hypervisor_id == ""
 
 
 - name: Get Citrix Cloud hypervisor resources
@@ -172,7 +172,7 @@
       VirtualNetwork: "{{ azure_region }}.region/virtualprivatecloud.folder/rg-golab-{{ environment_short }}-vnet.resourcegroup/vnet-infra-{{ environment_short }}.virtualprivatecloud"
     resource_subnets:
       Subnets: [ "{{ azure_region }}.region/virtualprivatecloud.folder/{{ azure_region }}.region/virtualprivatecloud.folder/rg-golab-{{ environment_short }}-vnet.resourcegroup/vnet-infra-{{ environment_short }}.virtualprivatecloud/sn-infra-{{ environment_short }}.network" ]
-  when: citrix_hypervisor_resource_id != None
+  when: citrix_hypervisor_resource_id == ""
 
 - name: Combining the facts for the resource body
   set_fact:
@@ -192,9 +192,9 @@
     return_content: yes
     status_code: [200, 201]
   register: citrix_new_resource
-  when: citrix_hypervisor_resource_id != None
+  when: citrix_hypervisor_resource_id == ""
 
 - name: debug citrix_new_resource
   ansible.builtin.debug:
     msg: "{{ citrix_new_resource }}"
-  when: citrix_hypervisor_resource_id != None
+  when: citrix_hypervisor_resource_id == ""
