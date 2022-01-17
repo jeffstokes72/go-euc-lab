@@ -5,9 +5,9 @@
         cards:   "card"
         flowers: "flow"
 
-  - name: Set the environment short
-    set_fact:
-      environment_short: "{{branches[branch | lower]}}"
+- name: Set the environment short
+  set_fact:
+    environment_short: "{{branches[branch | lower]}}"
 
 - name: Collect API access token from Citrix Cloud
   win_uri:
