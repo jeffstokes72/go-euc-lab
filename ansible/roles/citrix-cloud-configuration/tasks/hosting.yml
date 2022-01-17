@@ -139,9 +139,26 @@
 
 - name: Set the new hypervisor id
   set_fact:
-    citrix_new_hypervisor_id: "{{ citrix_new_hypervisor.json.Id }}"
+    citrix_hypervisor_id: "{{ citrix_new_hypervisor.json.Id }}"
     msg: "{{ citrix_new_hypervisor }}"
   when: citrix_hypervisor_id != None
+
+
+- name: Get Citrix Cloud hypervisor resources
+  win_uri:
+    url: "https://api.cloud.com/cvad/manage/hypervisors/{{ citrix_hypervisor_id }}/resourcePools"
+    method: GET
+    content_type: application/json
+    headers: "{'Citrix-CustomerId': '{{ citrix_org_id }}', 'Citrix-InstanceId': '{{ citrix_site_id }}', 'User-Agent': 'GET', 'Authorization': 'CWSAuth bearer={{citrix_token.json.access_token}}'}"
+    return_content: yes
+  register: citrix_hypervisor_resource
+
+- name: Set Citrix Cloud hypervisor resource ID
+  set_fact:
+    citrix_hypervisor_resource_id: "{{ data | json_query(querystr) }}"
+  vars:
+    data: "{{ citrix_hypervisor_resource.json }}"
+    querystr: "Items[?contains(Name,'{{ environment_short }}-{{ deploymentname }}-default')].Id | [0]" #First result
 
 - name: Creating Citrix Cloud resource body 
   set_fact: 
@@ -155,6 +172,7 @@
       VirtualNetwork: "{{ azure_region }}.region/virtualprivatecloud.folder/rg-golab-{{ environment_short }}-vnet.resourcegroup/vnet-infra-{{ environment_short }}.virtualprivatecloud"
     resource_subnets:
       Subnets: [ "{{ azure_region }}.region/virtualprivatecloud.folder/{{ azure_region }}.region/virtualprivatecloud.folder/rg-golab-{{ environment_short }}-vnet.resourcegroup/vnet-infra-{{ environment_short }}.virtualprivatecloud/sn-infra-{{ environment_short }}.network" ]
+  when: citrix_hypervisor_resource_id != None
 
 - name: Combining the facts for the resource body
   set_fact:
@@ -174,7 +192,9 @@
     return_content: yes
     status_code: [200, 201]
   register: citrix_new_resource
+  when: citrix_hypervisor_resource_id != None
 
 - name: debug citrix_new_resource
   ansible.builtin.debug:
     msg: "{{ citrix_new_resource }}"
+  when: citrix_hypervisor_resource_id != None
