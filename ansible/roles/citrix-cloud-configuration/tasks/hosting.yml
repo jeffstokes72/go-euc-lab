@@ -29,14 +29,11 @@
 
 - name: Debug sites
   ansible.builtin.debug:
-    msg: "{{ citrix_sites }}"
+    msg: "{{ citrix_sites.json }}"
 
 - name: Set Citrix Cloud site ID
   set_fact:
-    citrix_site_id: "{{ data | json_query(querystr) }}"
-  vars:
-    data: "{{ citrix_sites.json }}"
-    querystr: "sites[?contains(displayName,'Virtual Apps and Desktops')].id | [0]" #First result
+    citrix_site_id: "{{ citrix_sites.json.Id }}"
 
 - name: Debug sites
   ansible.builtin.debug:
