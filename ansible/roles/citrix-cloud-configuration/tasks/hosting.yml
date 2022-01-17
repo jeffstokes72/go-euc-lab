@@ -171,7 +171,7 @@
 
 - name: Post Citrix Cloud hypervisor connection
   win_uri:
-    url: https://api.cloud.com/cvad/manage/hypervisors/{{ citrix_new_hypervisor_id }}/resourcePools
+    url: https://api.cloud.com/cvad/manage/hypervisors/{{ citrix_hypervisor_id }}/resourcePools
     method: POST
     content_type: application/json
     headers: "{'Citrix-CustomerId': '{{ citrix_org_id }}', 'Citrix-InstanceId': '{{ citrix_site_id }}', 'User-Agent': 'POST', 'Authorization': 'CWSAuth bearer={{citrix_token.json.access_token}}'}"
