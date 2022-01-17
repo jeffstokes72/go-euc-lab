@@ -40,7 +40,6 @@
   serial: 1
   roles:
   - domain-join
-  - citrix-cloud-connector
   - citrix-cloud-configuration
   vars:
     dns_domain_name: 'GO.EUC'

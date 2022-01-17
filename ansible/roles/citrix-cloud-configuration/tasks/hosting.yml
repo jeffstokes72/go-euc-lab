@@ -11,7 +11,7 @@
 
 - name: Collect API access token from Citrix Cloud
   win_uri:
-    url: "https://api-eu.cloud.com/cctrustoauth2/{{ citrix_org_id }}/tokens/clients"
+    url: "https://api.cloud.com/cctrustoauth2/{{ citrix_org_id }}/tokens/clients"
     method: POST
     content_type: application/x-www-form-urlencoded
     body: "grant_type=client_credentials&client_id={{ citrix_client_id }}&client_secret={{ citrix_client_secret }}"
@@ -23,7 +23,7 @@
     url: https://api.cloud.com/cvad/manage/Sites/{{ citrix_org_id }}
     method: GET
     content_type: application/json
-    headers: "{'Citrix-CustomerId': '{{ citrix_org_id }}', Authorization': 'CWSAuth bearer={{citrix_token.json.access_token}}'}"
+    headers: "{'Citrix-CustomerId': '{{ citrix_org_id }}', 'Authorization': 'CWSAuth bearer={{citrix_token.json.access_token}}'}"
     return_content: yes
   register: citrix_sites
 
