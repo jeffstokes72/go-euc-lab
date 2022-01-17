@@ -1,5 +1,5 @@
 - name: Built the environment dictonary
-  vars:
+  set_fact:
     environment:
         default: "pois" 
         cards:   "card"
