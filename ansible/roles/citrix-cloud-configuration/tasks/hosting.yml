@@ -53,7 +53,7 @@
     citrix_hypervisor_id: "{{ data | json_query(querystr) }}"
   vars:
     data: "{{ citrix_hypervisor.json }}"
-    querystr: "Items[?contains(Name,'{{ prefix }}-{{ branch }}-AzureConnection')].Id | [0]" #First result
+    querystr: "Items[?contains(Name,'{{ prefix | lower }}-{{ environment_short }}-{{ deploymentname }}-azure')].Id | [0]" #First result
 
 - name: Debug hypervisor
   ansible.builtin.debug:
