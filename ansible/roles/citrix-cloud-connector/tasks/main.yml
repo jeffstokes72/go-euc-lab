@@ -69,7 +69,9 @@
 - name: Install Citrix Cloud Connector
   win_package:
     path: C:\Download\Citrix\cwcconnector.exe
-    product_id: '{E6CF2E41-E333-45D6-8EB6-CC429030F5A8}' # Citrix Cloud Services Agent System
+    product_id: '{D9238047-4916-4A6C-8FA3-242A5082AD37}' # Citrix Cloud Services Agent System
+    creates_path: C:\Program Files\Citrix\CloudServices\Agent\Citrix.CloudServices.Agent.exe
+    creates_service: CitrixWorkspaceCloudAgentSystem
     arguments: /q /CustomerName:"{{ citrix_org_id }}" /ClientId:"{{ citrix_client_id }}" /ClientSecret:"{{ citrix_client_secret }}" /Location:"{{ citrix_resource_id }}" /AcceptTermsOfService:true
     expected_return_code: [0]
     state: present
