@@ -27,10 +27,6 @@
     return_content: yes
   register: citrix_sites
 
-- name: Debug sites
-  ansible.builtin.debug:
-    msg: "{{ citrix_sites.json }}"
-
 - name: Set Citrix Cloud site ID
   set_fact:
     citrix_site_id: "{{ citrix_sites.json.Id }}"
@@ -115,11 +111,6 @@
     hosting_object: "{{ hosting_name | combine(hosting_connection_type, recursive=True) | combine(hosting_application_id, recursive=True) | combine(hosting_application_secret, recursive=True) | combine(hosting_subscription_id, recursive=True) | combine(hosting_active_directory_id, recursive=True) | combine(hosting_environment, recursive=True) | combine(hosting_zone, recursive=True) }}"
   when: citrix_hypervisor_id == ""
 
-- name: debug output 2
-  ansible.builtin.debug:
-    msg: "{{ hosting_object }}"
-  when: citrix_hypervisor_id == ""
-
 - name: Post Citrix Cloud hypervisor connection
   win_uri:
     url: https://api.cloud.com/cvad/manage/hypervisors
@@ -132,17 +123,11 @@
   register: citrix_new_hypervisor
   when: citrix_hypervisor_id == ""
 
-- name: debug output 2
-  ansible.builtin.debug:
-    msg: "{{ citrix_new_hypervisor }}"
-  when: citrix_hypervisor_id == ""
-
 - name: Set the new hypervisor id
   set_fact:
     citrix_hypervisor_id: "{{ citrix_new_hypervisor.json.Id }}"
     msg: "{{ citrix_new_hypervisor }}"
   when: citrix_hypervisor_id == ""
-
 
 - name: Get Citrix Cloud hypervisor resources
   win_uri:
