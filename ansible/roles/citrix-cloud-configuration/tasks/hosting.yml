@@ -20,10 +20,10 @@
 
 - name: Get Citrix Cloud sites
   win_uri:
-    url: https://api-us.cloud.com/catalogservice/{{ citrix_org_id }}/sites
+    url: https://api.cloud.com/cvad/manage/Sites/{{ citrix_org_id }}
     method: GET
     content_type: application/json
-    headers: "{'Authorization': 'CWSAuth bearer={{citrix_token.json.access_token}}'}"
+    headers: "{'Citrix-CustomerId': '{{ citrix_org_id }}', Authorization': 'CWSAuth bearer={{citrix_token.json.access_token}}'}"
     return_content: yes
   register: citrix_sites
 
