@@ -163,7 +163,7 @@
 
 - name: Combining the facts for the resource body
   set_fact:
-    resource_object: "{{ resource_name | combine(resource_connection, recursive=True) | combine(resource_networks, recursive=True) | combine(resource_region, recursive=True) | combine(resource_virtual_network, recursive=True) | combine(resource_subnets, recursive=True) | combine(resource_rootpath, recursive=True) }}"
+    resource_object: "{{ resource_name | combine(resource_connection, recursive=True) | combine(resource_region, recursive=True) | combine(resource_virtual_network, recursive=True) | combine(resource_subnets, recursive=True) | combine(resource_rootpath, recursive=True) }}"
 
 - name: Post Citrix Cloud hypervisor connection
   win_uri:
