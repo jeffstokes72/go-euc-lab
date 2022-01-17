@@ -119,6 +119,7 @@
     content_type: application/json
     headers: "{'Citrix-CustomerId': '{{ citrix_org_id }}', 'Citrix-InstanceId': '{{ citrix_site_id }}', 'User-Agent': 'POST', 'Authorization': 'CWSAuth bearer={{citrix_token.json.access_token}}'}"
     body: "{{ hosting_object | to_json }}"
+    status_code: [200, 201]
     return_content: yes
   register: citrix_new_hypervisor
   when: citrix_hypervisor_id != None
@@ -164,10 +165,11 @@
     headers: "{'Citrix-CustomerId': '{{ citrix_org_id }}', 'Citrix-InstanceId': '{{ citrix_site_id }}', 'User-Agent': 'POST', 'Authorization': 'CWSAuth bearer={{citrix_token.json.access_token}}'}"
     body: "{{ resource_object | to_json }}"
     return_content: yes
+    status_code: [200, 201]
   register: citrix_new_resource
   when: citrix_hypervisor_id != None
 
-- name: debug output 2
+- name: debug citrix_new_resource
   ansible.builtin.debug:
     msg: "{{ citrix_new_resource }}"
   when: citrix_hypervisor_id != None
