@@ -128,8 +128,46 @@
     msg: "{{ citrix_new_hypervisor }}"
   when: citrix_hypervisor_id != None
 
-- name: Define new hypervisor id
-  set_fact:
-    citrix_hypervisor_id: "{{ citrix_new_hypervisor.json.Id }}"
+# - name: Define new hypervisor id
+#   set_fact:
+#     citrix_hypervisor_id: "{{ citrix_new_hypervisor.json.Id }}"
+#   when: citrix_hypervisor_id != None
+
+- name: Creating Citrix Cloud resource body 
+  set_fact: 
+    resource_name:
+      Name: "{{ prefix }}-{{ branch }}-Default"
+    resource_connection:
+      ConnectionType: AzureRM
+    resource_networks:
+      Networks: [ "XDHyp:\\Connections\\{{ prefix }}-{{ branch }}-AzureConnection\\{{ azure_region }}.region\\virtualprivatecloud.folder\\rg-golab-{{ branch | lower }}-vnet.resourcegroup\\vnet-infra-{{ branch | lower }}.virtualprivatecloud\\default.network" ]
+    resource_region:
+      Region: "XDHyp:\\Connections\\{{ prefix }}-{{ branch }}-AzureConnection\\{{ azure_region }}.region"
+    resource_virtual_network:
+      VirtualNetwork: "XDHyp:\\Connections\\{{ prefix }}-{{ branch }}-AzureConnection\\{{ azure_region }}.region\\virtualprivatecloud.folder\\rg-golab-{{ branch | lower }}-vnet.resourcegroup\\vnet-infra-{{ branch | lower }}.virtualprivatecloud\\default.network"
+    resource_subnets:
+      Subnets: [ "XDHyp:\\Connections\\{{ prefix }}-{{ branch }}-AzureConnection\\{{ azure_region }}.region\\virtualprivatecloud.folder\\rg-golab-{{ branch | lower }}-vnet.resourcegroup\\vnet-infra-{{ branch | lower }}.virtualprivatecloud\\default.network" ]
+    resource_rootpath:
+      RootPath: "XDHyp:\\Connections\\{{ prefix }}-{{ branch }}-AzureConnection"
   when: citrix_hypervisor_id != None
 
+- name: Combining the facts for the resource body
+  set_fact:
+    resource_object: "{{ resource_name | combine(resource_connection, recursive=True) | combine(resource_networks, recursive=True) | combine(resource_region, recursive=True) | combine(resource_virtual_network, recursive=True) | combine(resource_subnets, recursive=True) | combine(resource_rootpath, recursive=True) }}"
+  when: citrix_hypervisor_id != None
+
+- name: Post Citrix Cloud hypervisor connection
+  win_uri:
+    url: https://api.cloud.com/cvad/manage/hypervisors/{{ prefix }}-{{ branch }}-AzureConnection/resourcePools
+    method: POST
+    content_type: application/json
+    headers: "{'Citrix-CustomerId': '{{ citrix_org_id }}', 'Citrix-InstanceId': '{{ citrix_site_id }}', 'User-Agent': 'POST', 'Authorization': 'CWSAuth bearer={{citrix_token.json.access_token}}'}"
+    body: "{{ resource_object | to_json }}"
+    return_content: yes
+  register: citrix_new_resource
+  when: citrix_hypervisor_id != None
+
+- name: debug output 2
+  ansible.builtin.debug:
+    msg: "{{ citrix_new_resource }}"
+  when: citrix_hypervisor_id != None
