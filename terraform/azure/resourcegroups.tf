@@ -29,3 +29,8 @@ resource "azurerm_resource_group" "SQL" {
   name     = "rg-${local.deploymentname}-${local.environment_abbreviations[terraform.workspace]}-sql"
   location = local.azure_location
 }
+
+resource "azurerm_resource_group" "AzureFiles" {
+  name     = "rg-${local.deploymentname}-${local.environment_abbreviations[terraform.workspace]}-azurefiles"
+  location = local.azure_location
+}
