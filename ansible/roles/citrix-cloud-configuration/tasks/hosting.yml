@@ -1,3 +1,14 @@
+- name: Built the environment dictonary
+  vars:
+    environment:
+        default: "pois" 
+        cards:   "card"
+        flowers: "flow"
+
+- name: Set the environment short
+  set_fact:
+    environment_short: environment["{{ branch | lower }}"]
+
 - name: Collect API access token from Citrix Cloud
   win_uri:
     url: "https://api-eu.cloud.com/cctrustoauth2/{{ citrix_org_id }}/tokens/clients"
@@ -78,7 +89,7 @@
   set_fact: 
     hosting_name:
       ConnectionDetails:
-        Name: "{{ prefix }}-{{ branch }}-AzureConnection"
+        Name: "{{ prefix }}-{{ environment_short }}-AzureConnection"
     hosting_connection_type:
       ConnectionDetails:
         ConnectionType: AzureRM
@@ -129,37 +140,34 @@
     msg: "{{ citrix_new_hypervisor }}"
   when: citrix_hypervisor_id != None
 
-# - name: Define new hypervisor id
-#   set_fact:
-#     citrix_hypervisor_id: "{{ citrix_new_hypervisor.json.Id }}"
-#   when: citrix_hypervisor_id != None
+- name: Set the new hypervisor id
+  set_fact:
+    citrix_new_hypervisor_id: "{{ citrix_new_hypervisor.json.Id }}"
+    msg: "{{ citrix_new_hypervisor }}"
+  when: citrix_hypervisor_id != None
 
 - name: Creating Citrix Cloud resource body 
   set_fact: 
     resource_name:
-      Name: "{{ prefix }}-{{ branch }}-Default"
+      Name: "{{ prefix }}-{{ environment_short }}-Default"
     resource_connection:
       ConnectionType: AzureRM
-    resource_networks:
-      Networks: [ "XDHyp:\\Connections\\{{ prefix }}-{{ branch }}-AzureConnection\\{{ azure_region }}.region\\virtualprivatecloud.folder\\rg-golab-{{ branch | lower }}-vnet.resourcegroup\\vnet-infra-{{ branch | lower }}.virtualprivatecloud\\default.network" ]
     resource_region:
-      Region: "XDHyp:\\Connections\\{{ prefix }}-{{ branch }}-AzureConnection\\{{ azure_region }}.region"
+      Region: "{{ azure_region }}.region"
     resource_virtual_network:
-      VirtualNetwork: "XDHyp:\\Connections\\{{ prefix }}-{{ branch }}-AzureConnection\\{{ azure_region }}.region\\virtualprivatecloud.folder\\rg-golab-{{ branch | lower }}-vnet.resourcegroup\\vnet-infra-{{ branch | lower }}.virtualprivatecloud\\default.network"
+      VirtualNetwork: "{{ azure_region }}.region/virtualprivatecloud.folder/{{ azure_region }}.region/virtualprivatecloud.folder/rg-golab-{{ environment_short }}-vnet.resourcegroup/vnet-infra-{{ environment_short }}.virtualprivatecloud/sn-infra-{{ environment_short }}.network"
     resource_subnets:
-      Subnets: [ "XDHyp:\\Connections\\{{ prefix }}-{{ branch }}-AzureConnection\\{{ azure_region }}.region\\virtualprivatecloud.folder\\rg-golab-{{ branch | lower }}-vnet.resourcegroup\\vnet-infra-{{ branch | lower }}.virtualprivatecloud\\default.network" ]
+      Subnets: [ "{{ azure_region }}.region/virtualprivatecloud.folder/rg-golab-{{ environment_short }}-vnet.resourcegroup/vnet-infra-{{ environment_short  }}.virtualprivatecloud" ]
     resource_rootpath:
-      RootPath: "XDHyp:\\Connections\\{{ prefix }}-{{ branch }}-AzureConnection"
-  when: citrix_hypervisor_id != None
+      RootPath: "XDHyp:/Connections/{{ prefix }}-{{ environment_short }}-AzureConnection"
 
 - name: Combining the facts for the resource body
   set_fact:
     resource_object: "{{ resource_name | combine(resource_connection, recursive=True) | combine(resource_networks, recursive=True) | combine(resource_region, recursive=True) | combine(resource_virtual_network, recursive=True) | combine(resource_subnets, recursive=True) | combine(resource_rootpath, recursive=True) }}"
-  when: citrix_hypervisor_id != None
 
 - name: Post Citrix Cloud hypervisor connection
   win_uri:
-    url: https://api.cloud.com/cvad/manage/hypervisors/{{ prefix }}-{{ branch }}-AzureConnection/resourcePools
+    url: https://api.cloud.com/cvad/manage/hypervisors/{{ citrix_new_hypervisor_id }}/resourcePools
     method: POST
     content_type: application/json
     headers: "{'Citrix-CustomerId': '{{ citrix_org_id }}', 'Citrix-InstanceId': '{{ citrix_site_id }}', 'User-Agent': 'POST', 'Authorization': 'CWSAuth bearer={{citrix_token.json.access_token}}'}"
@@ -167,9 +175,7 @@
     return_content: yes
     status_code: [200, 201]
   register: citrix_new_resource
-  when: citrix_hypervisor_id != None
 
 - name: debug citrix_new_resource
   ansible.builtin.debug:
     msg: "{{ citrix_new_resource }}"
-  when: citrix_hypervisor_id != None
