@@ -152,9 +152,9 @@
     resource_region:
       Region: "{{ azure_region }}.region"
     resource_virtual_network:
-      VirtualNetwork: "{{ azure_region }}.region/virtualprivatecloud.folder/{{ azure_region }}.region/virtualprivatecloud.folder/rg-golab-{{ environment_short }}-vnet.resourcegroup/vnet-infra-{{ environment_short }}.virtualprivatecloud/sn-infra-{{ environment_short }}.network"
+      VirtualNetwork: "{{ azure_region }}.region/virtualprivatecloud.folder/rg-golab-{{ environment_short }}-vnet.resourcegroup/vnet-infra-{{ environment_short }}.virtualprivatecloud"
     resource_subnets:
-      Subnets: [ "{{ azure_region }}.region/virtualprivatecloud.folder/rg-golab-{{ environment_short }}-vnet.resourcegroup/vnet-infra-{{ environment_short  }}.virtualprivatecloud" ]
+      Subnets: [ "{{ azure_region }}.region/virtualprivatecloud.folder/{{ azure_region }}.region/virtualprivatecloud.folder/rg-golab-{{ environment_short }}-vnet.resourcegroup/vnet-infra-{{ environment_short }}.virtualprivatecloud/sn-infra-{{ environment_short }}.network" ]
 
 - name: Combining the facts for the resource body
   set_fact:
