@@ -4,7 +4,7 @@ resource "random_integer" "azurefiles" {
 }
 
 resource "azurerm_storage_account" "azurefiles" {
-  name                     = "sainfra${local.environment_abbreviations[terraform.workspace]}${random_integer.azurefiles.result}"
+  name                     = "sa${local.environment_abbreviations[terraform.workspace]}${random_integer.azurefiles.result}"
   resource_group_name      = azurerm_resource_group.AzureFiles.name
   location                 = azurerm_resource_group.AzureFiles.location
   account_tier             = "Standard"
